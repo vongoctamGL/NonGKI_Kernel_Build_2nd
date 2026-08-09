@@ -173,12 +173,9 @@ jobs:
           echo "[+] Core susfs 2.2.0: giữ SUS_PATH/SUS_MOUNT/TRY_UMOUNT/SPOOF_UNAME; tắt kstat/map/open_redirect/cmdline-spoof."
 
       - name: 🛠 Cài mkdtimg (bonito build dtbo.img cần)
-        env:
-          GH_TOKEN: ${{ github.token }}
         run: |
-          gh api "repos/vongoctamGL/pixel3a-kernel-builder/contents/tools/mkdtimg" --jq '.content' | base64 -d > /tmp/mkdtimg
-          chmod +x /tmp/mkdtimg
-          sudo mv /tmp/mkdtimg /usr/local/bin/mkdtimg
+          chmod +x "$GITHUB_WORKSPACE/tools/mkdtimg"
+          sudo cp "$GITHUB_WORKSPACE/tools/mkdtimg" /usr/local/bin/mkdtimg
           file /usr/local/bin/mkdtimg || true
           echo "mkdtimg: $(command -v mkdtimg)"
 
