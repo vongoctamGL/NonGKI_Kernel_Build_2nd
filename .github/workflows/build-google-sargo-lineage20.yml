@@ -154,15 +154,24 @@ jobs:
             echo "[i] ksud.c: -f=$([ -f "$KSUD" ] && echo yes || echo no)"
           fi
 
-      - name: 🩹 Stub ksu_is_init_rc_hook_enabled (KSU-Next không có)
+      - name: 🩹 KSU-Next compat symbols cho susfs inline-hook (init_rc_hook + sys_read)
         run: |
           cd $GITHUB_WORKSPACE/device_kernel
-          KSU_C="drivers/kernelsu/ksu.c"
-          if [ -f "$KSU_C" ] && ! grep -q 'ksu_is_init_rc_hook_enabled' "$KSU_C"; then
-            printf '\nbool ksu_is_init_rc_hook_enabled(void) { return true; }\n' >> "$KSU_C"
-            echo "[+] Added ksu_is_init_rc_hook_enabled stub to ksu.c"
+          # susfs_inline_hook_patches.sh chèn vào fs/read_write.c (dưới #ifdef CONFIG_KSU):
+          #   extern struct static_key_true ksu_is_init_rc_hook_enabled;
+          #   extern int ksu_handle_sys_read(unsigned int fd);
+          #   if (static_branch_unlikely(&ksu_is_init_rc_hook_enabled)) ksu_handle_sys_read(fd);
+          # Đây là symbol của SukiSU/ReSukiSU; KSU-Next legacy KHÔNG có -> undefined ở link.
+          # Fix: định nghĩa vào cuối fs/read_write.c (đã compiled + đã có extern, khớp type).
+          # static_key init FALSE (disabled) -> nhánh KHÔNG bao giờ chạy -> ksu_handle_sys_read no-op.
+          RW="fs/read_write.c"
+          if [ -f "$RW" ] && grep -q 'ksu_is_init_rc_hook_enabled' "$RW" && ! grep -qF 'KSU_NEXT_INITRC_COMPAT' "$RW"; then
+            # base64: định nghĩa C (tránh lỗi YAML với ký tự đặc biệt)
+            echo 'Ci8qIEtTVV9ORVhUX0lOSVRSQ19DT01QQVQ6IHN5bWJvbCBTdWtpU1UgY2hvIHN1c2ZzIGlubGluZS1ob29rIChLU1UtTmV4dCBraG9uZyBjbykuCiAqIHN0YXRpY19rZXkgaW5pdCBGQUxTRSAtPiBuaGFuaCBrbG9uZyBjaGF5IC0+IGtzdV9oYW5kbGVfc3lzX3JlYWQgbm8tb3AuICovCnN0cnVjdCBzdGF0aWNfa2V5X3RydWUga3N1X2lzX2luaXRfcmNfaG9va19lbmFibGVkID0geyAua2V5ID0gU1RBVElDX0tFWV9JTklUX0ZBTFNFIH07Cl9fYXR0cmlidXRlX18oKGNvbGQpKSBpbnQga3N1X2hhbmRsZV9zeXNfcmVhZCh1bnNpZ25lZCBpbnQgZmQpIHsgcmV0dXJuIDA7IH0K' | base64 -d >> "$RW"
+            echo "[+] Added KSU_NEXT_INITRC_COMPAT symbols to fs/read_write.c"
+            tail -5 "$RW"
           else
-            echo "[i] ksu_is_init_rc_hook_enabled already present or ksu.c not found"
+            echo "[i] read_write.c: skip (present=$(grep -c ksu_is_init_rc_hook_enabled "$RW" 2>/dev/null), compat=$(grep -c KSU_NEXT_INITRC_COMPAT "$RW" 2>/dev/null))"
           fi
 
       - name: 🪛 Extra Kernel Options (bonito 4.9)
