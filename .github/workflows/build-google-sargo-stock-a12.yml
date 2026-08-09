@@ -128,7 +128,7 @@ jobs:
           fi
           # 3. strncpy_from_user_nofault (5.8+) shim vào cuối linux/uaccess.h (base64 tránh lỗi YAML heredoc)
           if ! grep -rq 'strncpy_from_user_nofault' include/linux/uaccess.h; then
-            echo 'CiNpZm5kZWYgc3RybmNweV9mcm9tX3VzZXJfbm9mYXVsdApzdGF0aWMgaW5saW5lIGxvbmcgc3RybmNweV9mcm9tX3VzZXJfbm9mYXVsdChjaGFyICpkc3QsIGNvbnN0IHZvaWQgX191c2VyICpzcmMsIGxvbmcgY291bnQpCnsKCWxvbmcgcmV0OwoJbW1fc2VnbWVudF90IG9sZF9mcyA9IGdldF9mcygpOwoJc2V0X2ZzKFVTRVJfRFMpOwoJcGFnZWZhdWx0X2Rpc2FibGUoKTsKCXJldCA9IHN0cm5jcHlfZnJvbV91c2VyKGRzdCwgc3JjLCBjb3VudCk7CglwYWdlZmF1bHRfZW5hYmxlKCk7CglzZXRfZnMob2xkX2ZzKTsKCXJldHVybiByZXQ7Cn0KI2VuZGlmCg==' | base64 -d >> include/linux/uaccess.h
+            echo 'CiNpZm5kZWYgX0NPTVBBVF9TVFJOQ1BZX0ZST01fVVNFUl9OT0ZBVUxUCiNkZWZpbmUgX0NPTVBBVF9TVFJOQ1BZX0ZST01fVVNFUl9OT0ZBVUxUCnN0YXRpYyBpbmxpbmUgbG9uZyBzdHJuY3B5X2Zyb21fdXNlcl9ub2ZhdWx0KGNoYXIgKmRzdCwgY29uc3Qgdm9pZCBfX3VzZXIgKnNyYywgbG9uZyBjb3VudCkKewoJbG9uZyByZXQ7CgltbV9zZWdtZW50X3Qgb2xkX2ZzID0gZ2V0X2ZzKCk7CglzZXRfZnMoVVNFUl9EUyk7CglwYWdlZmF1bHRfZGlzYWJsZSgpOwoJcmV0ID0gc3RybmNweV9mcm9tX3VzZXIoZHN0LCBzcmMsIGNvdW50KTsKCXBhZ2VmYXVsdF9lbmFibGUoKTsKCXNldF9mcyhvbGRfZnMpOwoJcmV0dXJuIHJldDsKfQojZW5kaWYK' | base64 -d >> include/linux/uaccess.h
             echo "[+] added strncpy_from_user_nofault shim"
           fi
 
