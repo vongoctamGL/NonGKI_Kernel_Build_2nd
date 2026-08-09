@@ -131,11 +131,15 @@ jobs:
             echo 'CiNpZm5kZWYgX0NPTVBBVF9TVFJOQ1BZX0ZST01fVVNFUl9OT0ZBVUxUCiNkZWZpbmUgX0NPTVBBVF9TVFJOQ1BZX0ZST01fVVNFUl9OT0ZBVUxUCnN0YXRpYyBpbmxpbmUgbG9uZyBzdHJuY3B5X2Zyb21fdXNlcl9ub2ZhdWx0KGNoYXIgKmRzdCwgY29uc3Qgdm9pZCBfX3VzZXIgKnNyYywgbG9uZyBjb3VudCkKewoJbG9uZyByZXQ7CgltbV9zZWdtZW50X3Qgb2xkX2ZzID0gZ2V0X2ZzKCk7CglzZXRfZnMoVVNFUl9EUyk7CglwYWdlZmF1bHRfZGlzYWJsZSgpOwoJcmV0ID0gc3RybmNweV9mcm9tX3VzZXIoZHN0LCBzcmMsIGNvdW50KTsKCXBhZ2VmYXVsdF9lbmFibGUoKTsKCXNldF9mcyhvbGRfZnMpOwoJcmV0dXJuIHJldDsKfQojZW5kaWYK' | base64 -d >> include/linux/uaccess.h
             echo "[+] added strncpy_from_user_nofault shim"
           fi
-          # 4. SukiSU builtin bug: runtime/ksud.c dùng ksu_selinux_hide_* nhưng quên #include feature/selinux_hide.h
+          # 4. SukiSU builtin BUG non-GKI: ksu.c chỉ #include feature/selinux_hide.c khi >=5.10,
+          #    nhưng runtime/ksud.c gọi ksu_selinux_hide_* vô điều kiện -> undefined khi link trên 4.9.
+          #    Fix: prepend stub rỗng vào ksud.c (feature selinux_hide tắt trên 4.9; susfs lo phần chính).
           KSUD="drivers/kernelsu/runtime/ksud.c"
-          if [ -f "$KSUD" ] && ! grep -qF 'selinux_hide.h' "$KSUD"; then
-            sed -i '1i #include "../feature/selinux_hide.h"' "$KSUD"
-            echo "[+] added selinux_hide.h include to ksud.c"
+          if [ -f "$KSUD" ] && ! grep -qF 'COMPAT_SELINUX_HIDE_STUB' "$KSUD"; then
+            echo 'Ly8gQ09NUEFUX1NFTElOVVhfSElERV9TVFVCIChrZXJuZWwgPDUuMTA6IGZlYXR1cmUvc2VsaW51eF9oaWRlLmMga2hvbmcgZHVvYyBjb21waWxlKQp2b2lkIGtzdV9zZWxpbnV4X2hpZGVfaGFuZGxlX3NlY29uZF9zdGFnZSh2b2lkKSB7fQp2b2lkIGtzdV9zZWxpbnV4X2hpZGVfaGFuZGxlX3Bvc3RfZnNfZGF0YSh2b2lkKSB7fQp2b2lkIGtzdV9zZWxpbnV4X2hpZGVfZHJvcF9iYWNrdXBfaWZfdW51c2VkKHZvaWQpIHt9CnZvaWQga3N1X3NlbGludXhfaGlkZV9pbml0KHZvaWQpIHt9CnZvaWQga3N1X3NlbGludXhfaGlkZV9leGl0KHZvaWQpIHt9Cg==' | base64 -d > /tmp/ksud.new
+            cat "$KSUD" >> /tmp/ksud.new
+            cp /tmp/ksud.new "$KSUD"
+            echo "[+] prepended selinux_hide stubs to ksud.c"
           else
             echo "[i] ksud.c: -f=$([ -f "$KSUD" ] && echo yes || echo no)"
           fi
