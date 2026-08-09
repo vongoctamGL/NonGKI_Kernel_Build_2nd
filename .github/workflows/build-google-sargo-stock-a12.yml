@@ -119,11 +119,26 @@ jobs:
           D="./arch/arm64/configs/${{ env.DEFCONFIG_NAME }}"
           # Tắt vdso32 (LLVM IAS không assemble được asm ARM32 -> build fail). App 32-bit vẫn chạy.
           echo "CONFIG_COMPAT_VDSO=n" >> "$D"
-          # An toàn khi build 4.9 bằng clang mới
           echo "CONFIG_LTO_NONE=y"     >> "$D"
           echo "CONFIG_LTO_CLANG=n"    >> "$D"
           echo "CONFIG_SHADOW_CALL_STACK=n" >> "$D"
           echo "CONFIG_CFI_CLANG=n"    >> "$D"
+
+      - name: 🩹 Core-susfs: revert 5 file phụ reject (API cũ) + tắt sub-feature tương ứng
+        run: |
+          cd $GITHUB_WORKSPACE/device_kernel
+          D="./arch/arm64/configs/${{ env.DEFCONFIG_NAME }}"
+          # Trả 5 file bị reject về nguyên bản Google (bỏ trạng thái partial gây lỗi cú pháp)
+          git checkout -- fs/proc/cmdline.c fs/stat.c fs/notify/fdinfo.c security/selinux/avc.c fs/proc/task_mmu.c 2>/dev/null || true
+          find . -name '*.rej' -delete 2>/dev/null || true
+          find . -name '*.orig' -delete 2>/dev/null || true
+          # Tắt các sub-feature dùng API cũ (giữ lõi SUS_PATH + SUS_MOUNT + TRY_UMOUNT + SPOOF_UNAME)
+          for k in CONFIG_KSU_SUSFS_SPOOF_CMDLINE_OR_BOOTCONFIG CONFIG_KSU_SUSFS_SUS_KSTAT \
+                   CONFIG_KSU_SUSFS_SUS_MAP CONFIG_KSU_SUSFS_OPEN_REDIRECT; do
+            sed -i "/^$k=/d" "$D"
+            echo "# $k is not set" >> "$D"
+          done
+          echo "[+] Core susfs 2.2.0: giữ SUS_PATH/SUS_MOUNT/TRY_UMOUNT/SPOOF_UNAME; tắt kstat/map/open_redirect/cmdline-spoof."
 
       - name: 🚀 Build Process
         uses: ./.github/workflows/build-process
