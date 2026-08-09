@@ -172,6 +172,13 @@ jobs:
           done
           echo "[+] Core susfs 2.2.0: giữ SUS_PATH/SUS_MOUNT/TRY_UMOUNT/SPOOF_UNAME; tắt kstat/map/open_redirect/cmdline-spoof."
 
+      - name: 🛠 Cài mkdtimg (bonito build dtbo.img cần)
+        run: |
+          curl -sL "https://github.com/vongoctamGL/pixel3a-kernel-builder/raw/main/tools/mkdtimg" -o /tmp/mkdtimg
+          chmod +x /tmp/mkdtimg
+          sudo mv /tmp/mkdtimg /usr/local/bin/mkdtimg
+          echo "mkdtimg: $(command -v mkdtimg)"
+
       - name: 🚀 Build Process
         uses: ./.github/workflows/build-process
 
