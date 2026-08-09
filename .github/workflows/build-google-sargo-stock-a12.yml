@@ -154,6 +154,24 @@ jobs:
             echo "[i] ksud.c: -f=$([ -f "$KSUD" ] && echo yes || echo no)"
           fi
 
+      - name: 🩹 Stub ksu_is_init_rc_hook_enabled (KSU-Next không có)
+        run: |
+          cd $GITHUB_WORKSPACE/device_kernel
+          # syscall hook patch inject gọi ksu_is_init_rc_hook_enabled trong fs/exec.c
+          # nhưng KSU-Next legacy không export hàm này → undefined reference
+          # Fix: thêm stub trả true vào cuối drivers/kernelsu/ksu.c (hoặc tạo file riêng)
+          KSU_C="drivers/kernelsu/ksu.c"
+          if [ -f "$KSU_C" ] && ! grep -q 'ksu_is_init_rc_hook_enabled' "$KSU_C"; then
+            cat >> "$KSU_C" << 'STUB_EOF'
+
+/* Stub: syscall hook patch calls this but KSU-Next legacy doesn't provide it */
+bool ksu_is_init_rc_hook_enabled(void) { return true; }
+STUB_EOF
+            echo "[+] Added ksu_is_init_rc_hook_enabled stub to ksu.c"
+          else
+            echo "[i] ksu_is_init_rc_hook_enabled already present or ksu.c not found"
+          fi
+
       - name: 🪛 Extra Kernel Options (bonito 4.9)
         run: |
           cd $GITHUB_WORKSPACE/device_kernel
