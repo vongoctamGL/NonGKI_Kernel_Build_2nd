@@ -34,7 +34,7 @@ env:
   KERNELSU_SOURCE : ""
   KERNELSU_BRANCH : ""
   KERNELSU_AUTO_GET : "true"
-  KERNELSU_AUTO_FORK : "next" # KernelSU-Next — cấu trúc phẳng, hỗ trợ non-GKI 4.9 vững (tránh lỗi modbuiltin của subdir SukiSU)
+  KERNELSU_AUTO_FORK : "sukisu" # SukiSU-Ultra (builtin+susfs) — thêm backport 4.9 ở step riêng
 
   SUSFS_ENABLE : true
   SUSFS_FIXED : false
@@ -112,6 +112,40 @@ jobs:
 
       - name: 🔗 Patch for no-kprobe
         uses: ./.github/workflows/patch-no-kprobe
+
+      - name: 🧩 Backport 4.9 cho SukiSU (fallthrough / strncpy_from_user_nofault / set_memory.h)
+        run: |
+          cd $GITHUB_WORKSPACE/device_kernel
+          # 1. fallthrough (macro có từ ~5.4, 4.9 chưa có)
+          if ! grep -rq 'define fallthrough' include/linux/compiler.h include/linux/compiler_types.h 2>/dev/null; then
+            printf '\n#ifndef fallthrough\n#define fallthrough do {} while (0)\n#endif\n' >> include/linux/compiler.h
+            echo "[+] added fallthrough"
+          fi
+          # 2. linux/set_memory.h (4.9 để set_memory_* trong asm/cacheflush.h)
+          if [ ! -f include/linux/set_memory.h ]; then
+            printf '#ifndef _LINUX_SET_MEMORY_H\n#define _LINUX_SET_MEMORY_H\n#include <asm/cacheflush.h>\n#endif\n' > include/linux/set_memory.h
+            echo "[+] created linux/set_memory.h"
+          fi
+          # 3. strncpy_from_user_nofault (5.8+) shim vào cuối linux/uaccess.h
+          if ! grep -rq 'strncpy_from_user_nofault' include/linux/uaccess.h; then
+            cat >> include/linux/uaccess.h <<'EOF'
+
+#ifndef strncpy_from_user_nofault
+static inline long strncpy_from_user_nofault(char *dst, const void __user *src, long count)
+{
+	long ret;
+	mm_segment_t old_fs = get_fs();
+	set_fs(USER_DS);
+	pagefault_disable();
+	ret = strncpy_from_user(dst, src, count);
+	pagefault_enable();
+	set_fs(old_fs);
+	return ret;
+}
+#endif
+EOF
+            echo "[+] added strncpy_from_user_nofault shim"
+          fi
 
       - name: 🪛 Extra Kernel Options (bonito 4.9)
         run: |
