@@ -81,7 +81,7 @@ env:
   GENERATE_CHIP: "qcom"
 
   BUILD_DEBUGGER: "true"   # in lỗi build để soi & vá bonito-specific
-  SKIP_PATCH: "false"
+  SKIP_PATCH: "true"   # bỏ qua 4 rej phụ (cmdline/stat/fdinfo/avc) -> inline-hook lo phần lõi; tinh chỉnh sau nếu cần
 
   BUILD_OTHER_CONFIG: "false"   # bonito_defconfig của Google là standalone
   MERGE_CONFIG_FILES: ""
