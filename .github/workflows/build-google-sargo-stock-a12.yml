@@ -44,7 +44,7 @@ env:
 
   BOOT_SOURCE : ""
 
-  NEED_DTBO : false
+  NEED_DTBO : true
   NEED_SAFE_DTBO : false
 
   ROM_TEXT : "stock_a12_4.9"
@@ -52,14 +52,14 @@ env:
   PYTHON_VERSION: "3"
 
   PACK_METHOD: "Anykernel3"
-  PACK_KMODULES: "false"
+  PACK_KMODULES: "true"
 
-  KERNELSU_METHOD: "shell"
+  KERNELSU_METHOD: "manual"
 
   PATCHES_SOURCE: "JackA1ltman/NonGKI_Kernel_Patches"
   PATCHES_BRANCH: "mi_kernel"
 
-  SUSFS_FOLDER_FIXED: ""   # bonito là device mới -> chưa có fixup riêng, dựa base susfs_patch_to_4.9 + inline hook
+  SUSFS_FOLDER_FIXED: ""
   SUSFS_PATCH_FIXED: ""
 
   REKERNEL_ENABLE: "false"
@@ -68,7 +68,7 @@ env:
 
   HOOK_METHOD: "syscall"
 
-  KERNEL_PATCH: "true"   # kernel 4.9 -> bật patch kernel_write/kernel_read
+  KERNEL_PATCH: "true"
 
   KPM_ENABLE: "false"
   KPM_INLINE: "false"
@@ -80,10 +80,10 @@ env:
   GENERATE_DTB: "false"
   GENERATE_CHIP: "qcom"
 
-  BUILD_DEBUGGER: "true"   # in lỗi build để soi & vá bonito-specific
-  SKIP_PATCH: "true"   # bỏ qua 4 rej phụ (cmdline/stat/fdinfo/avc) -> inline-hook lo phần lõi; tinh chỉnh sau nếu cần
+  BUILD_DEBUGGER: "true"
+  SKIP_PATCH: "false"
 
-  BUILD_OTHER_CONFIG: "false"   # bonito_defconfig của Google là standalone
+  BUILD_OTHER_CONFIG: "false"
   MERGE_CONFIG_FILES: ""
 
   FREE_MORE_SPACE: "true"
@@ -136,7 +136,7 @@ jobs:
           #    Fix: prepend stub rỗng vào ksud.c (feature selinux_hide tắt trên 4.9; susfs lo phần chính).
           KSUD="drivers/kernelsu/runtime/ksud.c"
           if [ -f "$KSUD" ] && ! grep -qF 'COMPAT_SELINUX_HIDE_STUB' "$KSUD"; then
-            echo 'Ly8gQ09NUEFUX1NFTElOVVhfSElERV9TVFVCIChrZXJuZWwgPDUuMTA6IGZlYXR1cmUvc2VsaW51eF9oaWRlLmMga2hvbmcgZHVvYyBjb21waWxlKQp2b2lkIGtzdV9zZWxpbnV4X2hpZGVfaGFuZGxlX3NlY29uZF9zdGFnZSh2b2lkKSB7fQp2b2lkIGtzdV9zZWxpbnV4X2hpZGVfaGFuZGxlX3Bvc3RfZnNfZGF0YSh2b2lkKSB7fQp2b2lkIGtzdV9zZWxpbnV4X2hpZGVfZHJvcF9iYWNrdXBfaWZfdW51c2VkKHZvaWQpIHt9CnZvaWQga3N1X3NlbGludXhfaGlkZV9pbml0KHZvaWQpIHt9CnZvaWQga3N1X3NlbGludXhfaGlkZV9leGl0KHZvaWQpIHt9Cg==' | base64 -d > /tmp/ksud.new
+            echo 'Ly8gQ09NUEFUX1NFTElOVVhfSElERV9TVFVCIChrZXJuZWwgPDUuMTA6IGZlYXR1cmUvc2VsaW51eF9oaWRlLmMga2hvbmcgZHVvYyBjb21waWxlKQp2b2lkIGtzdV9zZWxpbnV4X2hpZGVfaGFuZGxlX3NlY29uZF9zdGFnZSh2b2lkKSB7fQp2b2lkIGtzdV9zZWxpbnV4X2hpZGVfaGFuZGxlX3Bvc3RfZnNfZGF0YSh2b2lkKSB7fQp2b2lkIGtzdV9zZWxpbnV4X2hpZGVfZHJvcF9iYWNrdXBfaWZfdW51c2VkKHZvaWQpIHt9CnZvaWQga3N1X3NlbGludXhfaGlkZV9pbml0KHZvaWQpIHt9CnZvaWQga3N1X3NlbGludXhfaGlkZV_leGl0KHZvaWQpIHt9Cg==' | base64 -d > /tmp/ksud.new
             cat "$KSUD" >> /tmp/ksud.new
             cp /tmp/ksud.new "$KSUD"
             echo "[+] prepended selinux_hide stubs to ksud.c"
