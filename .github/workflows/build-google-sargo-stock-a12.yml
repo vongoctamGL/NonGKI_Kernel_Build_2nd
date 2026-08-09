@@ -14,7 +14,7 @@ env:
 
   # Kernel LineageOS 20 (4.9.x) — community-patched, SUSFS áp sạch hơn Google Stock.
   KERNEL_SOURCE : "https://github.com/LineageOS/android_kernel_google_msm-4.9.git"
-  KERNEL_BRANCH : "lineage-20.0"
+  KERNEL_BRANCH : "lineage-20"
 
   # proton-clang: hợp kernel 4.x cũ hơn clang mới
   CLANG_SOURCE : "https://github.com/kdrag0n/proton-clang.git"
