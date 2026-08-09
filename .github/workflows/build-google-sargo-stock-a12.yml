@@ -34,9 +34,9 @@ env:
   KERNELSU_SOURCE : ""
   KERNELSU_BRANCH : ""
   KERNELSU_AUTO_GET : "true"
-  KERNELSU_AUTO_FORK : "sukisu" # SukiSU-Ultra (builtin+susfs) — thêm backport 4.9 ở step riêng
+  KERNELSU_AUTO_FORK : "next"   # KSU-Next: manager release dong bo, test detection tren Google Stock
 
-  SUSFS_ENABLE : true
+  SUSFS_ENABLE : false   # tat susfs de test detection thuan KSU-Next truoc
   SUSFS_FIXED : false
 
   AK3_SOURCE : "https://github.com/Oneloutre/AnyKernel3.git"
@@ -106,13 +106,6 @@ jobs:
 
       - name: ⚙️ Get neccssary tools
         uses: ./.github/workflows/build-ready
-
-      - name: 📌 Pin SukiSU ve 40813 (khop manager whyred)
-        run: |
-          cd $GITHUB_WORKSPACE/device_kernel/KernelSU
-          git fetch --depth=300 origin builtin 2>/dev/null || git fetch --unshallow origin builtin 2>/dev/null || true
-          git checkout 9dbed96401a0 2>&1 | tail -1
-          echo "SukiSU pinned = $(git rev-parse --short HEAD) ; count = $(git rev-list --count HEAD)"
 
       - name: 🪝 Patch Kernel of SUSFS
         uses: ./.github/workflows/patch-susfs
