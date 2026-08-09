@@ -124,7 +124,7 @@ jobs:
           echo "CONFIG_SHADOW_CALL_STACK=n" >> "$D"
           echo "CONFIG_CFI_CLANG=n"    >> "$D"
 
-      - name: 🩹 Core-susfs: revert 5 file phụ reject (API cũ) + tắt sub-feature tương ứng
+      - name: 🩹 Core-susfs revert 5 file phụ reject (API cũ) va tat sub-feature
         run: |
           cd $GITHUB_WORKSPACE/device_kernel
           D="./arch/arm64/configs/${{ env.DEFCONFIG_NAME }}"
