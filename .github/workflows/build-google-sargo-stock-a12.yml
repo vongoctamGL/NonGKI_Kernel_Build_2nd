@@ -1,4 +1,4 @@
-name: Build Google Pixel 3a sargo (Stock A12) SukiSU + SUSFS 2.2.0 (Kernel 4.9)
+name: Build Google Pixel 3a sargo (LineageOS 20) KSU-Next + SUSFS 2.2.0 (Kernel 4.9)
 
 on:
   workflow_call:
@@ -12,9 +12,9 @@ env:
   CUSTOM_CMDS : "CLANG_TRIPLE=aarch64-linux-gnu-"
   EXTRA_CMDS : "LLVM=1 LLVM_IAS=1"
 
-  # Kernel Google STOCK Android 12L (4.9.292) — khớp máy đang chạy -> đảm bảo boot trên Stock A12. Nguồn SẠCH (không susfs).
-  KERNEL_SOURCE : "https://android.googlesource.com/kernel/msm"
-  KERNEL_BRANCH : "android-msm-bonito-4.9-android12L"
+  # Kernel LineageOS 20 (4.9.x) — community-patched, SUSFS áp sạch hơn Google Stock.
+  KERNEL_SOURCE : "https://github.com/LineageOS/android_kernel_google_msm-4.9.git"
+  KERNEL_BRANCH : "lineage-20.0"
 
   # proton-clang: hợp kernel 4.x cũ hơn clang mới
   CLANG_SOURCE : "https://github.com/kdrag0n/proton-clang.git"
@@ -36,7 +36,7 @@ env:
   KERNELSU_AUTO_GET : "true"
   KERNELSU_AUTO_FORK : "next"   # KSU-Next: manager release dong bo, test detection tren Google Stock
 
-  SUSFS_ENABLE : false   # tat susfs de test detection thuan KSU-Next truoc
+  SUSFS_ENABLE : true   # bat susfs tren LineageOS kernel
   SUSFS_FIXED : false
 
   AK3_SOURCE : "https://github.com/Oneloutre/AnyKernel3.git"
@@ -47,7 +47,7 @@ env:
   NEED_DTBO : true
   NEED_SAFE_DTBO : false
 
-  ROM_TEXT : "stock_a12_4.9"
+  ROM_TEXT : "lineage20_4.9"
 
   PYTHON_VERSION: "3"
 
@@ -90,7 +90,7 @@ env:
 
 jobs:
   build-kernel:
-    name: Google Pixel 3a sargo (Stock A12) (Kernel 4.9)
+    name: Google Pixel 3a sargo (LineageOS 20) (Kernel 4.9)
     runs-on: ubuntu-22.04
     env:
       CCACHE_COMPILERCHECK: "%compiler% -dumpmachine; %compiler% -dumpversion"

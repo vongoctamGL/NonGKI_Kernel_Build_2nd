@@ -159,12 +159,8 @@ runs:
                 KERNELSU_AUTHOR="KernelSU-Next"
                 KERNELSU_NAME="KernelSU-Next"
                 KERNELSU_ORIGIN_BRANCH="legacy"
-                if [[ "${{ env.SUSFS_ENABLE }}" == "true" ]]; then
-                    echo "[-] ${{ env.KERNELSU_AUTO_FORK }} doesn't support SuSFS! "
-                    false
-                else
-                    KERNELSU_BRANCH="legacy"
-                fi
+                # SUSFS on KSU-Next: use legacy branch (SUSFS patch applied separately)
+                KERNELSU_BRANCH="legacy"
 
             elif [[ "${{ env.KERNELSU_AUTO_FORK }}" == "resukisu" ]]; then
                 KERNELSU_AUTHOR="ReSukiSU"
