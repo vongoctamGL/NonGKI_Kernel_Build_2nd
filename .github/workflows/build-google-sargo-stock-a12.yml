@@ -107,6 +107,16 @@ jobs:
       - name: ⚙️ Get neccssary tools
         uses: ./.github/workflows/build-ready
 
+      - name: 🩹 KSU-Next 4.9 compat (security_context_to_sid 5-arg)
+        run: |
+          cd $GITHUB_WORKSPACE/device_kernel
+          SH="drivers/kernelsu/feature/selinux_hide.c"
+          if [ -f "$SH" ] && ! grep -q 'selinux_state,' "$SH"; then
+            sed -i 's/security_context_to_sid("u:r:/security_context_to_sid(\&selinux_state, "u:r:/g' "$SH"
+            echo "[+] patched security_context_to_sid in selinux_hide.c"
+            grep -n 'security_context_to_sid' "$SH" | head
+          fi
+
       - name: 🪝 Patch Kernel of SUSFS
         uses: ./.github/workflows/patch-susfs
 
