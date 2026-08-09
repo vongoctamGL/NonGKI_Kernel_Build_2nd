@@ -133,9 +133,11 @@ jobs:
           fi
           # 4. SukiSU builtin bug: runtime/ksud.c dùng ksu_selinux_hide_* nhưng quên #include feature/selinux_hide.h
           KSUD="drivers/kernelsu/runtime/ksud.c"
-          if [ -f "$KSUD" ] && ! grep -q 'selinux_hide.h' "$KSUD"; then
+          if [ -f "$KSUD" ] && ! grep -qF 'selinux_hide.h' "$KSUD"; then
             sed -i '1i #include "../feature/selinux_hide.h"' "$KSUD"
             echo "[+] added selinux_hide.h include to ksud.c"
+          else
+            echo "[i] ksud.c: -f=$([ -f "$KSUD" ] && echo yes || echo no)"
           fi
 
       - name: 🪛 Extra Kernel Options (bonito 4.9)
