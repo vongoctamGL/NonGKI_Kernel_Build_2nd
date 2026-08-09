@@ -81,7 +81,7 @@ env:
   GENERATE_CHIP: "qcom"
 
   BUILD_DEBUGGER: "true"
-  SKIP_PATCH: "false"
+  SKIP_PATCH: "true"   # giu revert 5 file reject (nếu false -> patch susfs dừng)
 
   BUILD_OTHER_CONFIG: "false"
   MERGE_CONFIG_FILES: ""
