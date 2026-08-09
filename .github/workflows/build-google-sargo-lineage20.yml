@@ -36,7 +36,7 @@ env:
   KERNELSU_AUTO_GET : "true"
   KERNELSU_AUTO_FORK : "next"   # KSU-Next: manager release dong bo, test detection tren Google Stock
 
-  SUSFS_ENABLE : true   # bat susfs tren LineageOS kernel
+  SUSFS_ENABLE : false   # TAM TAT: co lap - susfs inline-hook pha detection tren 4.9. Chot root+wifi truoc.
   SUSFS_FIXED : false
 
   AK3_SOURCE : "https://github.com/Oneloutre/AnyKernel3.git"
