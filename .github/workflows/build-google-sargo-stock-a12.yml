@@ -113,6 +113,18 @@ jobs:
       - name: 🔗 Patch for no-kprobe
         uses: ./.github/workflows/patch-no-kprobe
 
+      - name: 🪛 Extra Kernel Options (bonito 4.9)
+        run: |
+          cd $GITHUB_WORKSPACE/device_kernel
+          D="./arch/arm64/configs/${{ env.DEFCONFIG_NAME }}"
+          # Tắt vdso32 (LLVM IAS không assemble được asm ARM32 -> build fail). App 32-bit vẫn chạy.
+          echo "CONFIG_COMPAT_VDSO=n" >> "$D"
+          # An toàn khi build 4.9 bằng clang mới
+          echo "CONFIG_LTO_NONE=y"     >> "$D"
+          echo "CONFIG_LTO_CLANG=n"    >> "$D"
+          echo "CONFIG_SHADOW_CALL_STACK=n" >> "$D"
+          echo "CONFIG_CFI_CLANG=n"    >> "$D"
+
       - name: 🚀 Build Process
         uses: ./.github/workflows/build-process
 
