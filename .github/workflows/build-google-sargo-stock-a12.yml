@@ -126,24 +126,9 @@ jobs:
             printf '#ifndef _LINUX_SET_MEMORY_H\n#define _LINUX_SET_MEMORY_H\n#include <asm/cacheflush.h>\n#endif\n' > include/linux/set_memory.h
             echo "[+] created linux/set_memory.h"
           fi
-          # 3. strncpy_from_user_nofault (5.8+) shim vào cuối linux/uaccess.h
+          # 3. strncpy_from_user_nofault (5.8+) shim vào cuối linux/uaccess.h (base64 tránh lỗi YAML heredoc)
           if ! grep -rq 'strncpy_from_user_nofault' include/linux/uaccess.h; then
-            cat >> include/linux/uaccess.h <<'EOF'
-
-#ifndef strncpy_from_user_nofault
-static inline long strncpy_from_user_nofault(char *dst, const void __user *src, long count)
-{
-	long ret;
-	mm_segment_t old_fs = get_fs();
-	set_fs(USER_DS);
-	pagefault_disable();
-	ret = strncpy_from_user(dst, src, count);
-	pagefault_enable();
-	set_fs(old_fs);
-	return ret;
-}
-#endif
-EOF
+            echo 'CiNpZm5kZWYgc3RybmNweV9mcm9tX3VzZXJfbm9mYXVsdApzdGF0aWMgaW5saW5lIGxvbmcgc3RybmNweV9mcm9tX3VzZXJfbm9mYXVsdChjaGFyICpkc3QsIGNvbnN0IHZvaWQgX191c2VyICpzcmMsIGxvbmcgY291bnQpCnsKCWxvbmcgcmV0OwoJbW1fc2VnbWVudF90IG9sZF9mcyA9IGdldF9mcygpOwoJc2V0X2ZzKFVTRVJfRFMpOwoJcGFnZWZhdWx0X2Rpc2FibGUoKTsKCXJldCA9IHN0cm5jcHlfZnJvbV91c2VyKGRzdCwgc3JjLCBjb3VudCk7CglwYWdlZmF1bHRfZW5hYmxlKCk7CglzZXRfZnMob2xkX2ZzKTsKCXJldHVybiByZXQ7Cn0KI2VuZGlmCg==' | base64 -d >> include/linux/uaccess.h
             echo "[+] added strncpy_from_user_nofault shim"
           fi
 
