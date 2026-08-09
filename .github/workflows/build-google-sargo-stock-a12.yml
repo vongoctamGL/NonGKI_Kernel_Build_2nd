@@ -34,7 +34,7 @@ env:
   KERNELSU_SOURCE : ""
   KERNELSU_BRANCH : ""
   KERNELSU_AUTO_GET : "true"
-  KERNELSU_AUTO_FORK : "sukisu" # SukiSU-Ultra (giống whyred)
+  KERNELSU_AUTO_FORK : "resukisu" # ReSukiSU — biến thể SukiSU tương thích kernel cũ 4.9 (framework dùng cho các máy non-GKI khác)
 
   SUSFS_ENABLE : true
   SUSFS_FIXED : false
