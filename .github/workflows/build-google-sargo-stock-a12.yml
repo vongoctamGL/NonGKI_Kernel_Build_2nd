@@ -150,6 +150,11 @@ jobs:
           echo "CONFIG_LTO_CLANG=n"    >> "$D"
           echo "CONFIG_SHADOW_CALL_STACK=n" >> "$D"
           echo "CONFIG_CFI_CLANG=n"    >> "$D"
+          # Tắt auto-version (git hash + dirty) -> chuỗi uts không vượt 64 ký tự. susfs SPOOF_UNAME giả version stock trên máy.
+          sed -i '/^CONFIG_LOCALVERSION_AUTO=/d' "$D"
+          echo "# CONFIG_LOCALVERSION_AUTO is not set" >> "$D"
+          sed -i '/^CONFIG_LOCALVERSION=/d' "$D"
+          echo 'CONFIG_LOCALVERSION=""' >> "$D"
 
       - name: 🩹 Core-susfs revert 5 file phụ reject (API cũ) va tat sub-feature
         run: |
