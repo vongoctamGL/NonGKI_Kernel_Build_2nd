@@ -131,6 +131,12 @@ jobs:
             echo 'CiNpZm5kZWYgX0NPTVBBVF9TVFJOQ1BZX0ZST01fVVNFUl9OT0ZBVUxUCiNkZWZpbmUgX0NPTVBBVF9TVFJOQ1BZX0ZST01fVVNFUl9OT0ZBVUxUCnN0YXRpYyBpbmxpbmUgbG9uZyBzdHJuY3B5X2Zyb21fdXNlcl9ub2ZhdWx0KGNoYXIgKmRzdCwgY29uc3Qgdm9pZCBfX3VzZXIgKnNyYywgbG9uZyBjb3VudCkKewoJbG9uZyByZXQ7CgltbV9zZWdtZW50X3Qgb2xkX2ZzID0gZ2V0X2ZzKCk7CglzZXRfZnMoVVNFUl9EUyk7CglwYWdlZmF1bHRfZGlzYWJsZSgpOwoJcmV0ID0gc3RybmNweV9mcm9tX3VzZXIoZHN0LCBzcmMsIGNvdW50KTsKCXBhZ2VmYXVsdF9lbmFibGUoKTsKCXNldF9mcyhvbGRfZnMpOwoJcmV0dXJuIHJldDsKfQojZW5kaWYK' | base64 -d >> include/linux/uaccess.h
             echo "[+] added strncpy_from_user_nofault shim"
           fi
+          # 4. SukiSU builtin bug: runtime/ksud.c dùng ksu_selinux_hide_* nhưng quên #include feature/selinux_hide.h
+          KSUD="drivers/kernelsu/runtime/ksud.c"
+          if [ -f "$KSUD" ] && ! grep -q 'selinux_hide.h' "$KSUD"; then
+            sed -i '1i #include "../feature/selinux_hide.h"' "$KSUD"
+            echo "[+] added selinux_hide.h include to ksud.c"
+          fi
 
       - name: 🪛 Extra Kernel Options (bonito 4.9)
         run: |
