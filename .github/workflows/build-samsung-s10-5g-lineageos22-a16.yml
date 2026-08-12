@@ -9,8 +9,8 @@ env:
   DEVICE_NAME : "samsung_s10_5g"
   DEVICE_CODENAME : "beyondx"
 
-  CUSTOM_CMDS : "CLANG_TRIPLE=aarch64-linux-gnu-"
-  EXTRA_CMDS : "LLVM=1 LLVM_IAS=1"
+  CUSTOM_CMDS : "CLANG_TRIPLE=aarch64-linux-gnu- CROSS_COMPILE=aarch64-linux-android- CROSS_COMPILE_ARM32=arm-linux-androideabi-"
+  EXTRA_CMDS : ""
 
   KERNEL_SOURCE : "https://github.com/ravindu644/android_kernel_aosp_exynos9820.git"
   KERNEL_BRANCH : "lineage-22.1"
